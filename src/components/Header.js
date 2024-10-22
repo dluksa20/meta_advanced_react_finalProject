@@ -63,6 +63,7 @@ const Header = () => {
           justifyContent="space-between"
           alignItems="center"
         >
+          
           <nav>
             {/* Add social media links based on the `socials` data */}
           </nav>

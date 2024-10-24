@@ -22,10 +22,43 @@ const LandingSection = () => {
   const { onOpen } = useAlertContext();
 
   const formik = useFormik({
-    initialValues: {},
-    onSubmit: (values) => {},
-    validationSchema: Yup.object({}),
+    initialValues: {
+      firstName: '',
+      email: '',
+      type: '',
+      comment: ''
+    },
+    validationSchema: Yup.object({
+      firstName: Yup.string()
+        .min(2, 'First name must be at least 2 characters')
+        .required('First name is required'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+      type: Yup.string()
+        .required('Please select a type of enquiry'),
+      comment: Yup.string()
+        .min(10, 'Comment must be at least 10 characters')
+        .required('Comment is required'),
+    }),
+
+    onSubmit: async (values) => {
+      await submit(values);
+    },
   });
+
+  useEffect(() => {
+    if (response) {
+      if (response.type === "success") {
+        onOpen("success", `Your message was sent successfully`);
+        formik.resetForm(); // Reset the form on success
+      } else if (response.type === "error") {
+        onOpen("error", "There was an error sending your message.");
+      }
+    }
+    // Only include specific form values in the dependency array
+  }, [response]);
+
 
   return (
     <FullScreenSection
@@ -39,28 +72,36 @@ const LandingSection = () => {
           Contact me
         </Heading>
         <Box p={6} rounded="md" w="100%">
-          <form>
+
+          <form onSubmit={formik.handleSubmit}>
             <VStack spacing={4}>
-              <FormControl isInvalid={false}>
+              <FormControl isInvalid={formik.touched.firstName && formik.errors.firstName}>
                 <FormLabel htmlFor="firstName">Name</FormLabel>
                 <Input
                   id="firstName"
                   name="firstName"
+                  {...formik.getFieldProps('firstName')}
                 />
-                <FormErrorMessage></FormErrorMessage>
+                <FormErrorMessage>{formik.errors.firstName}</FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={false}>
+
+              <FormControl isInvalid={formik.touched.email && formik.errors.email}>
                 <FormLabel htmlFor="email">Email Address</FormLabel>
                 <Input
                   id="email"
                   name="email"
                   type="email"
+                  {...formik.getFieldProps('email')}
                 />
-                <FormErrorMessage></FormErrorMessage>
+                <FormErrorMessage>{formik.errors.email}</FormErrorMessage>
               </FormControl>
-              <FormControl>
+
+              <FormControl isInvalid={formik.touched.type && formik.errors.type}>
                 <FormLabel htmlFor="type">Type of enquiry</FormLabel>
-                <Select id="type" name="type">
+                <Select id="type"
+                        name="type"
+                        {...formik.getFieldProps('type')}
+                        >
                   <option value="hireMe">Freelance project proposal</option>
                   <option value="openSource">
                     Open source consultancy session
@@ -68,18 +109,22 @@ const LandingSection = () => {
                   <option value="other">Other</option>
                 </Select>
               </FormControl>
-              <FormControl isInvalid={false}>
+
+              <FormControl isInvalid={formik.touched.comment && formik.errors.comment}>
                 <FormLabel htmlFor="comment">Your message</FormLabel>
                 <Textarea
                   id="comment"
                   name="comment"
                   height={250}
+                  {...formik.getFieldProps('comment')}
                 />
                 <FormErrorMessage></FormErrorMessage>
               </FormControl>
-              <Button type="submit" colorScheme="purple" width="full">
+
+              <Button type="submit" colorScheme="purple" width="full" isLoading = {isLoading}>
                 Submit
               </Button>
+
             </VStack>
           </form>
         </Box>

@@ -6,19 +6,17 @@ import React from "react";
 const Card = ({ title, description, imageSrc }) => {
   return (
     <Box
-      borderWidth="1px"
       borderRadius="lg"
       overflow="hidden"
-      boxShadow="md"
       maxW="sm"
       bg="white"
       display="flex"
       flexDirection="column"
-      justifyContent="space-around"
+      justifyContent="space-between"
     >
       <Image src={imageSrc} alt={title} objectFit="cover" w="100%" h="200px" />
 
-      <VStack p={4} align="start" spacing={2}>
+      <VStack p={6} align="start" spacing={2}>
 
         <Heading as="h3" size="md">
           {title}
